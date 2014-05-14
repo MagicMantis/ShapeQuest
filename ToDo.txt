@@ -1,0 +1,13 @@
+ShapeQuest to-do:
+
+combat
+  *projectiles
+  *health / dying
+  *respawing
+GUI
+  *health bar
+  *color values/stats
+  *minimap?
+Server/Client commands
+Character Creation?
+  *starting color
