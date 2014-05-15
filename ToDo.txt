@@ -11,3 +11,6 @@ GUI
 Server/Client commands
 Character Creation?
   *starting color
+User Accounts
+  *username
+  *password

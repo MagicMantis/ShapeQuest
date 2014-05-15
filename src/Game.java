@@ -137,7 +137,7 @@ public class Game extends JPanel implements KeyListener, MouseListener, MouseMot
 		for (int i = 0; i < players.size(); i++)
 		{
 			Player p = players.get(i);
-			bufferGraphics.setColor(p.getColor());
+			bufferGraphics.setColor(Color.BLACK);
 			bufferGraphics.setFont(new Font("Dialog", Font.PLAIN, 12));
 			bufferGraphics.drawString(p.getName(), (int) (p.getX()+5-(2.5*p.getName().length())), p.getY()-1);
 		}

@@ -88,17 +88,17 @@ public class Client extends JFrame {
 	
 	public Player initPlayer() throws Exception {
 		
-		int x, y, pid, r, g, b;
+		int x, y, pid, atk, def, spd;
 		String n;
 		pid = in.readInt();
 		x = in.readInt();
 		y = in.readInt();
-		r = in.readInt();
-		g = in.readInt();
-		b = in.readInt();
+		atk = in.readInt();
+		def = in.readInt();
+		spd = in.readInt();
 		n = in.readUTF();
 
-		Player player = new Player(x, y, pid, new Color(r,g,b), n);
+		Player player = new Player(x, y, pid, new int[]{atk,def,spd}, n);
 		return player;
 	}
 	

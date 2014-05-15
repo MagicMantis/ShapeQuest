@@ -5,19 +5,53 @@ import java.util.ArrayList;
 public class Player {
 	
 	private int x, y;
+	private int rVal, bVal, gVal;
 	private int hp, maxhp;
+	private int attack;
+	private int defense;
+	private int speed;
 	private int playerID;
 	private Color color;
 	private String name;
 	
-	public Player(int x, int y, int pid, Color color, String name)
+	public Player(int x, int y, int pid, int[] stats, String name)
 	{
 		this.x = x;
 		this.y = y;
+		// colorVals = [atk, def, spd]
+		this.attack = stats[0];
+		this.defense = stats[1];
+		this.speed = stats[2];
+		setColor();
 		this.playerID = pid;
-		this.color = color;
 		this.name = name;
-		this.setHp(this.maxhp = 100);
+		this.hp = setMaxHp();
+	}
+	
+	private Color setColor() {
+		int rVal = 155 + attack;
+		int gVal = 155 + defense;
+		int bVal = 155 + speed;
+		if(attack > defense && attack > speed) {
+			gVal -= attack;
+			bVal -= attack;
+		}
+		else if(defense > speed) {
+			rVal -= defense;
+			bVal -= defense;
+		}
+		else { // speed is greatest stat
+			rVal -= speed;
+			gVal -= speed;
+		}
+		System.out.println("r: " + rVal);
+		System.out.println("g: " + gVal);
+		System.out.println("b: " + bVal);
+		return this.color = new Color(rVal, bVal, gVal);
+	}
+	
+	private int setMaxHp() {
+		return this.maxhp = 100 + bVal;
 	}
 	
 	public void move(int xmove, int ymove, ArrayList<Player> players)
