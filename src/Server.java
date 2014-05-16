@@ -1,3 +1,7 @@
+/* Server Class */
+/* The server is a JFrame application that
+ * manages communication between clients */
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -25,18 +29,22 @@ public class Server extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
+	//variable that determines the maximum number of simultaneous connections
 	public static final int MAX_USERS = 10;
 
 	public static Random random = new Random();
 	
 	public static ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	
+	//declares sockets and streams for network communication
 	ServerSocket serverSocket;
 	Socket socket;
 	DataOutputStream out;
 	DataInputStream in;
+	//declares a list of users that will handle communication with individual clients
 	static Users user[] = new Users[MAX_USERS];
 	
+	//declare Swing components for Server GUI
 	JPanel chatWindow;
 	JTextPane chatPane;
 	JScrollPane scrollPane;
@@ -52,8 +60,11 @@ public class Server extends JFrame {
 		printMessage("Server Starting...");
 		serverSocket = new ServerSocket(port);
 		printMessage("Server Online");
+		//this loop waits for a connection attempt
 		while(true) {
 			socket = serverSocket.accept();
+			//upon receiving connection request, finds first available user id
+			//and sets up an instance of user in that slot
 			for (int i = 0; i < MAX_USERS; i++)
 			{
 				printMessage("Connection from: "+ socket.getInetAddress());
@@ -61,6 +72,7 @@ public class Server extends JFrame {
 				in = new DataInputStream(socket.getInputStream());
 				if (user[i] == null)
 				{
+					//generates new users base stats
 					int[] stats = new int[3];
 					switch(Math.abs(random.nextInt()) % 3) {
 					case 0:
@@ -73,6 +85,9 @@ public class Server extends JFrame {
 						stats[2] = 10;
 					}
 					user[i] = new Users(out, in, user, this, i, stats);
+					/* Users are threads that run simultaneously with the main thread.
+					 * While the main thread listens for connection requests, User threads
+					 * handle communication with clients */
 					Thread thread = new Thread(user[i]);
 					thread.start();
 					break;
@@ -81,6 +96,7 @@ public class Server extends JFrame {
 		}
 	}	
 	
+	//this function sets up a JFrame and necessary GUI components
 	private void initGui()
 	{
 		this.setPreferredSize(new Dimension(640, 480));
@@ -116,11 +132,14 @@ public class Server extends JFrame {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
 					String message = chatField.getText();
+					//interprets message as command if begins with '/'
 					if (message.charAt(0) == '/')
 					{
 						serverCommand(message);
 					}
-					else {
+					//else prints sends message to all users
+					else if (!message.equals(""))
+					{
 						printMessage("Server", message);
 						for (int i = 0; i < MAX_USERS; i++) {
 							if (user[i] != null) {
@@ -128,6 +147,7 @@ public class Server extends JFrame {
 							}
 						}
 					}
+					//resets chat field
 					chatField.setText("");
 				}
 			}
@@ -153,24 +173,21 @@ public class Server extends JFrame {
 		Server server = new Server(12975);
 	}
 	
+	//prints a message to the server log
 	public void printMessage(String message)
 	{
 		chatPane.setText(chatPane.getText()+message+"\n");
 		chatPane.setCaretPosition(chatPane.getText().length());
 	}
 	
+	//prints a message with a name to the server log
 	public void printMessage(String name, String message)
 	{
 		chatPane.setText(chatPane.getText()+name+": "+message+"\n");
 		chatPane.setCaretPosition(chatPane.getText().length());
 	}
 	
-	public void printMessage(String name, String message, Color color)
-	{
-		chatPane.setText(chatPane.getText()+name+": "+message+"\n");
-		chatPane.setCaretPosition(chatPane.getText().length());
-	}
-	
+	//evaluates command parameter and performs corresponding action
 	public void serverCommand(String command)
 	{
 		String action, param = "";
@@ -185,6 +202,8 @@ public class Server extends JFrame {
 		}
 		action = command.substring(1, actionEnd);
 		//do action
+		
+		//prints list of players
 		if (action.equals("players"))
 		{
 			printMessage("Players Online: ");
@@ -194,6 +213,7 @@ public class Server extends JFrame {
 				printMessage(user[i].getPlayerID() + ". "+user[i].getName());
 			}
 		}
+		//kicks specified player
 		else if (action.equals("kick"))
 		{
 			int kickID = 0;
@@ -233,7 +253,8 @@ public class Server extends JFrame {
 				printMessage("No Player: "+param);
 			}
 		}
-		else if (action.equals("exit"))
+		//stops server
+		else if (action.equals("exit") || action.equals("stop"))
 		{
 			System.exit(0);
 		}
@@ -243,6 +264,7 @@ public class Server extends JFrame {
 	}
 }
 
+//this class will handle server logic (ie missles)
 class ServerLogic implements Runnable {
 	
 	public void run() {

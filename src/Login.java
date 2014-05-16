@@ -1,3 +1,8 @@
+/* Login Class */
+/* This class creates a gui that allows players 
+ * to enter ip and username. It will eventually
+ * not have the ip and be replaced by passwords */
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -24,6 +29,7 @@ public class Login extends JFrame {
 	
 	public Login()
 	{
+		//setup JFrame
 		super("Login");
 		setPreferredSize(new Dimension(350, 250));
 		setSize(new Dimension(340, 120));
@@ -31,6 +37,7 @@ public class Login extends JFrame {
 		setResizable(false);
 		setLayout(new GridLayout(3, 1));
 		
+		//set up GUI
 		top = new JPanel(new FlowLayout());
 		address = new JLabel("IP Address:");
 		top.add(address);
@@ -60,6 +67,7 @@ public class Login extends JFrame {
 		passfield.setEditable(false);
 		bottom.add(passfield);
 		
+		//set up action event for login button
 		loginButton = new JButton("Login");
 		loginButton.addActionListener(new ActionListener() {
 			@Override
@@ -79,6 +87,7 @@ public class Login extends JFrame {
 		this.setVisible(true);
 	}
 	
+    //checks to see if button should be active
 	public void update()
 	{
 		if (userfield.getText().length() > 15)
@@ -96,6 +105,7 @@ public class Login extends JFrame {
 		}
 	}
 
+	//returns if connection was successful
 	public boolean getSuccessful()
 	{
 		return successful;
