@@ -1,3 +1,4 @@
+package client;
 import java.awt.Color;
 
 public class Helpers {

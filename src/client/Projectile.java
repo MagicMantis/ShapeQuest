@@ -1,5 +1,9 @@
+package client;
 import java.awt.Graphics;
 
+/* Projectile Class */
+/* This class provides a basis for all 
+ * projectiles in the game */
 
 public class Projectile {
 
@@ -18,8 +22,8 @@ public class Projectile {
 	}
 	
 	public void update() {
-		double xSpeed = Math.cos(direction*Math.PI/180)*speed;
-		double ySpeed = Math.sin(direction*Math.PI/180)*speed;
+		double xSpeed = Math.cos(direction)*speed;
+		double ySpeed = Math.sin(direction)*speed;
 		x += xSpeed;
 		y += ySpeed;
 	}

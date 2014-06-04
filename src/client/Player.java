@@ -1,3 +1,4 @@
+package client;
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ public class Player {
 	{
 		this.x = x;
 		this.y = y;
-		// colorVals = [atk, def, spd]
+		// colorVals = [attack, defense, speed]
 		this.attack = stats[0];
 		this.defense = stats[1];
 		this.speed = stats[2];
@@ -44,9 +45,6 @@ public class Player {
 			rVal -= speed;
 			gVal -= speed;
 		}
-		System.out.println("r: " + rVal);
-		System.out.println("g: " + gVal);
-		System.out.println("b: " + bVal);
 		return this.color = new Color(rVal, bVal, gVal);
 	}
 	
@@ -111,7 +109,7 @@ public class Player {
 		return maxhp;
 	}
 
-	public void setHp(int hp) {
+	public void setHP(int hp) {
 		this.hp = hp;
 	}
 }

@@ -1,3 +1,4 @@
+package server;
 /* Server Class */
 /* The server is a JFrame application that
  * manages communication between clients */
@@ -9,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+
+import client.Projectile;
 
 public class Server extends JFrame {
 
@@ -63,15 +65,17 @@ public class Server extends JFrame {
 		//this loop waits for a connection attempt
 		while(true) {
 			socket = serverSocket.accept();
+			printMessage("Connection from: "+ socket.getInetAddress());
 			//upon receiving connection request, finds first available user id
 			//and sets up an instance of user in that slot
 			for (int i = 0; i < MAX_USERS; i++)
 			{
-				printMessage("Connection from: "+ socket.getInetAddress());
+				printMessage("Attempting to assign User["+i+"]");
 				out = new DataOutputStream(socket.getOutputStream());
 				in = new DataInputStream(socket.getInputStream());
 				if (user[i] == null)
 				{
+					printMessage("Connection Assigned to User["+i+"]");
 					//generates new users base stats
 					int[] stats = new int[3];
 					switch(Math.abs(random.nextInt()) % 3) {
@@ -170,7 +174,7 @@ public class Server extends JFrame {
 	public static void main(String args[]) throws Exception
 	{
 		@SuppressWarnings("unused")
-		Server server = new Server(12975);
+		Server server = new Server(8080);
 	}
 	
 	//prints a message to the server log
@@ -211,6 +215,25 @@ public class Server extends JFrame {
 			{
 				if (user[i] != null)
 				printMessage(user[i].getPlayerID() + ". "+user[i].getName());
+			}
+		}
+		//sets hp of all players to value given
+		else if (action.equals("sethp"))
+		{
+			int val;
+			try {
+				val = Integer.valueOf(param);
+			} catch (Exception e){
+				printMessage("\""+param+"\" could not be converted to an Integer");
+				return;
+			}
+			printMessage("Setting Players HP to "+val);
+			for (int i = 0; i < MAX_USERS; i++)
+			{
+				if (user[i] != null)
+				{
+					user[i].setHP(val);
+				}
 			}
 		}
 		//kicks specified player
@@ -262,29 +285,4 @@ public class Server extends JFrame {
 			printMessage("Unknown Command: "+action);
 		}
 	}
-}
-
-//this class will handle server logic (ie missles)
-class ServerLogic implements Runnable {
-	
-	public void run() {
-		while (true) {
-			for (int i = 0; i < Server.projectiles.size(); i++) {
-				Projectile p = Server.projectiles.get(i);
-				p.update();
-				for (int j = 0; j < Server.MAX_USERS; j++)
-				{
-					Users u = Server.user[j];
-					if (p.getX() > u.getX()-2 && p.getX() < u.getX()+14 && 
-							p.getY() > u.getY()-2 && p.getY() < u.getY()+14)
-					{
-						Server.user[j].pRemoveQueue.add(p);
-						Server.user[j].setHP(Server.user[j].getHP()-10);
-					}
-						
-				}
-			}
-		}
-	}
-	
 }

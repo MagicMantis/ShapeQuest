@@ -1,8 +1,10 @@
-import java.awt.Color;
+package server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import client.Projectile;
 
 class Users implements Runnable {
 
@@ -65,6 +67,7 @@ class Users implements Runnable {
 		//server loop
 		while (true) {
 			
+			//if player has been disconnected by server
 			if (disconnected)
 			{
 				try {
@@ -74,6 +77,7 @@ class Users implements Runnable {
 				}
 				break;
 			}
+			//if other players have left the game
 			else if (removeQueue.size() > 0)
 			{
 				try {
@@ -83,7 +87,7 @@ class Users implements Runnable {
 					e.printStackTrace();
 				}
 			}
-			
+			//if other players have joined/are in the game
 			else if (userQueue.size() > 0)
 			{
 				try {
@@ -93,11 +97,12 @@ class Users implements Runnable {
 					e.printStackTrace();
 				}
 			}
-			
+			//else read a message from the client
 			else {
 
 				try {
 					String message = in.readUTF();
+					//if client wants to add player
 					if (message.equals("pa"))
 					{
 						int x = in.readInt();
@@ -105,6 +110,7 @@ class Users implements Runnable {
 						this.x = x;
 						this.y = y;
 					}
+					//if client sends a chat message
 					else if (message.equals("pm"))
 					{
 						String s = in.readUTF();
@@ -116,23 +122,27 @@ class Users implements Runnable {
 							}
 						}
 					}
+					//if client fired a projectile
 					else if (message.equals("ma"))
 					{
-						double mx = in.readDouble();
-						double my = in.readDouble();
+						//double mx = in.readDouble();
+						//double my = in.readDouble();
 						double dir = in.readDouble();
-						Server.projectiles.add(new Projectile(mx, my, dir, 3));
+						Server.projectiles.add(new Projectile(getX()+8, getY()+8, dir, 3));
 						for (int i = 0; i < Server.MAX_USERS; i++) {
-							if (user[i] != null && user[i].playerid != getPlayerID()) {
-								out.writeUTF("ma");
-								out.writeDouble(mx);
-								out.writeDouble(my);
-								out.writeDouble(dir);
+							System.out.println("Current User: "+i);
+							if (user[i] != null /*&& user[i].playerid != getPlayerID()*/) {
+								System.out.println(getPlayerID()+"'s projectile sent to "+user[i].playerid);
+								user[i].out.writeUTF("ma");
+								user[i].out.writeDouble(getX()+6);
+								user[i].out.writeDouble(getY()+6);
+								user[i].out.writeDouble(dir);
 							}
 						}
 					}
+					//update other players for this user
 					for (int i = 0; i < Server.MAX_USERS; i++) {
-						if (user[i] != null && user[i].playerid != getPlayerID()) {
+						if (user[i] != null && user[i].getPlayerID() != getPlayerID()) {
 							out.writeUTF("pu");
 							out.writeInt(user[i].getPlayerID());
 							out.writeInt(user[i].getX());
@@ -140,6 +150,10 @@ class Users implements Runnable {
 							out.writeInt(user[i].getHP());
 						}
 					}
+					//update this players variables that are managed by server (ex. health)
+					out.writeUTF("mpu");
+					out.writeInt(getHP());
+					//add chat messages recieved
 					while (chatQueue.size() > 0)
 					{
 						out.writeUTF("pm");

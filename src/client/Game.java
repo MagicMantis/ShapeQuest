@@ -1,3 +1,4 @@
+package client;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -33,6 +34,7 @@ public class Game extends JPanel implements KeyListener, MouseListener, MouseMot
 	
 	private String name;
 	private Player myPlayer;
+	private HUD myHUD;
 	
 	private boolean chatMode = false;
 	
@@ -142,15 +144,18 @@ public class Game extends JPanel implements KeyListener, MouseListener, MouseMot
 			bufferGraphics.drawString(p.getName(), (int) (p.getX()+5-(2.5*p.getName().length())), p.getY()-1);
 		}
 		bufferGraphics.setColor(Color.BLACK);
-		for (Projectile p: projectiles)
+		for (int i = 0; i < projectiles.size(); i++)
 		{
+			Projectile p = projectiles.get(i);
 			p.draw(bufferGraphics);
 		}
-		for (ClientMessage e: chatLog)
+		for (int i = 0; i < chatLog.size(); i++)
 		{
+			ClientMessage e = chatLog.get(i);
 			bufferGraphics.drawString(e.getMessage(), e.getX(), e.getY());
 		}
 		chatField.draw(bufferGraphics, name, chatMode);
+		myHUD.draw(bufferGraphics);
 		g.drawImage(buffer, 0, 0, null);
 	}
 	
@@ -162,11 +167,17 @@ public class Game extends JPanel implements KeyListener, MouseListener, MouseMot
 		}
 		chatLog.add(new ClientMessage(message));
 	}
+	
+	public Player getMyPlayer()
+	{
+		return myPlayer;
+	}
 
 	public void setMyPlayer(Player player)
 	{
 		myPlayer = player;
 		name = player.getName();
+		myHUD = new HUD(myPlayer);
 		addPlayer(myPlayer);
 	}
 	
@@ -181,8 +192,13 @@ public class Game extends JPanel implements KeyListener, MouseListener, MouseMot
 		{
 			if (playerID == p.getPlayerID())
 			p.setPos(x, y);
-			p.setHp(hp);
+			p.setHP(hp);
 		}
+	}
+	
+	public void updateMyPlayer(int hp)
+	{
+		myPlayer.setHP(hp);
 	}
 	
 	public void removePlayer(int playerID) {
@@ -222,13 +238,14 @@ public class Game extends JPanel implements KeyListener, MouseListener, MouseMot
 	}
 
 	public void mousePressed(MouseEvent e) {
-		int px = myPlayer.getX()+8;
-		int py = myPlayer.getY()+8;
-		double angle = Math.atan2(e.getY()-py, e.getX()-px)*180/Math.PI;
+		int px = myPlayer.getX();
+		int py = myPlayer.getY();
+		double angle = Math.atan2(e.getY()-32-py, e.getX()-16-px);
 		Projectile p = new Projectile(px,py,angle,4);
 		projectiles.add(p);
 		try {
 			client.initProjectile(p);
+			projectiles.remove(p);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

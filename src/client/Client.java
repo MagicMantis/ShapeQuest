@@ -1,3 +1,4 @@
+package client;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +21,7 @@ public class Client extends JFrame {
 	public DataInputStream in;
 	public DataOutputStream out;
 	
-	private static Input input;
+	private static ClientInput input;
 	
 	public Game game;
 	
@@ -33,7 +34,7 @@ public class Client extends JFrame {
 		out.writeUTF(name);
 		in.readUTF();
 		game.setMyPlayer(initPlayer());
-		input = new Input(in, this);
+		input = new ClientInput(in, this);
 		Thread ithread = new Thread(input);
 		ithread.start();
 		Thread thread = new Thread(game);
@@ -120,74 +121,12 @@ public class Client extends JFrame {
 	public void initProjectile(Projectile p) throws IOException {
 		
 		out.writeUTF("ma");
-		out.writeDouble(p.getX());
-		out.writeDouble(p.getY());
+		//out.writeDouble(p.getX());
+		//out.writeDouble(p.getY());
 		out.writeDouble(p.getDirection());
+		
 		
 	}
 	
 }
 
-class Input implements Runnable {
-	
-	DataInputStream in;
-	Client client;
-	
-	public Input(DataInputStream in, Client client) {
-		this.in = in;
-		this.client = client;
-	}
-	
-	public void run() {
-		while(true){
-			String message;
-			try {
-				message = in.readUTF();
-				if (message.equals("pu"))
-				{
-					int pid = in.readInt();
-					int x = in.readInt();
-					int y = in.readInt();
-					int hp = in.readInt();
-					client.game.updatePlayer(pid, x, y, hp);
-				}
-				else if (message.equals("pa"))
-				{
-					client.game.addPlayer(client.initPlayer());
-				}
-				else if (message.equals("pr"))
-				{
-					int pid = in.readInt();
-					client.game.removePlayer(pid);
-				}
-				else if (message.equals("pm"))
-				{
-					String s = in.readUTF();
-					client.game.printMessage(s);
-				}
-				else if (message.equals("ma"))
-				{
-					double mx = in.readDouble();
-					double my = in.readDouble();
-					double mdir = in.readDouble();
-					Game.projectiles.add(new Projectile(mx, my, mdir, 3));
-				}
-				else if (message.equals("dc"))
-				{
-					client.game.printMessage("Error - Lost Connection to Server");
-					client.game.onDisconnect();
-					client.socket = null;
-				}
-				else {
-					System.out.println(message);
-				}
-			} catch (Exception e) {
-				client.game.printMessage("Error - Lost Connection to Server");
-				client.game.onDisconnect();
-				client.socket = null;
-				break;
-			}
-		}
-	}
-	
-}

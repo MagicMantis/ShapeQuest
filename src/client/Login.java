@@ -1,3 +1,4 @@
+package client;
 /* Login Class */
 /* This class creates a gui that allows players 
  * to enter ip and username. It will eventually
@@ -45,7 +46,7 @@ public class Login extends JFrame {
 		addressfield.setText("localhost");
 		top.add(addressfield);
 		portfield = new JTextField(6);
-		portfield.setText("12975");
+		portfield.setText("8080");
 		portfield.setEditable(false);
 		top.add(portfield);
 		
